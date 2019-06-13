@@ -67,7 +67,7 @@ OPERATE opt;
 
 /****************************************************/
 /*****											*****/
-/*****			  関数プロトタイプ宣言			*****/
+/*****			  関数プロトタイプ宣言				*****/
 /*****											*****/
 /****************************************************/
 
@@ -102,10 +102,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 		switch( GAMESTATE ) {
 
-			case GAME_TITLE:
-			case GAME_INIT:
-			case GAME_MAIN:
-			case GAME_END:
+			case GAME_TITLE:	//
+			case GAME_INIT:		//
+			case GAME_MAIN:		//
+			case GAME_END:		//
 				break;
 		}
 	

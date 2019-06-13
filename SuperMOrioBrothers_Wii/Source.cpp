@@ -1,7 +1,7 @@
 #include "DxLib.h"
 
 //デバッグモード
-//#define _DEBUGMODE
+#define _DEBUGMODE
 
 //フレームレート定数( 60 )
 #define	_FRAMERATE_60	60
@@ -16,8 +16,9 @@
 //ゲーム状態変数
 static int GAMESTATE;
 
-//フレームレート系変数
+//リフレッシュレート確認用変数
 static int RefreshRate;
+HDC hdc;
 
 /*****      ゲームモード列挙体      *****/
 typedef enum GAME_MODE {
@@ -79,6 +80,7 @@ static void FR_Wait( );
 void DrawTitle();
 void GameInit();
 void GameMain();
+void DrawStage();
 void DrawEnd();
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow ) {
@@ -89,6 +91,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	ChangeWindowMode( TRUE );
 	SetGraphMode( 640, 480, 32 );
 	SetDrawScreen( DX_SCREEN_BACK );
+
+	/*****          リフレッシュレート確認            *****/
+	hdc = GetDC( GetMainWindowHandle() ) ;	// デバイスコンテキストの取得
+	RefreshRate = GetDeviceCaps( hdc, VREFRESH ) ;	// リフレッシュレートの取得
+	ReleaseDC( GetMainWindowHandle(), hdc ) ;	// デバイスコンテキストの解放
 
 	if ( DxLib_Init() == -1 )	return -1;
 
@@ -103,9 +110,16 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		switch( GAMESTATE ) {
 
 			case GAME_TITLE:
+				DrawTitle();
+				break;
 			case GAME_INIT:
+				GameInit();
+				break;
 			case GAME_MAIN:
+				GameMain();
+				break;
 			case GAME_END:
+				DrawEnd();
 				break;
 		}
 	
@@ -157,5 +171,33 @@ static void FR_Wait( ) {
 }
 
 void DrawTitle() {
-	DrawFormatString( 0, 0, 0xffffff, "A" );
+	int x;
+
+	x = 320 - GetDrawStringWidth( "MARIO", 5 );
+	DrawFormatString( x, 240, 0xff0000, "MARIO" );
+
+	x = 320 - GetDrawStringWidth( "Push Space", 10 );
+	DrawFormatString( x, 400, 0xffffff, "Push Space" );
+
+	if ( opt.Kflg & PAD_INPUT_10 ) {
+		GAMESTATE = GAME_INIT;
+	} else if ( opt.Kflg & PAD_INPUT_START ) {
+		GAMESTATE = GAME_END;
+	}
+}
+
+void GameInit() {
+	GAMESTATE = GAME_MAIN;
+}
+
+void GameMain() {
+	DrawFormatString( 0, 0, 0xffffff, "MAIN" );
+
+	if ( opt.Kflg & PAD_INPUT_10 ) {
+		GAMESTATE = GAME_TITLE;
+	}
+}
+
+void DrawEnd() {
+	GAMESTATE = END;
 }
